@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平面圖</title>
+<style>
+    body, html {
+        height: 200%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        width:auto;
+        height:auto;
+        position: relative;
+    }
+
+    .base-image {
+        width: 100%;
+        height: auto;
+    }
+
+    .overlay {
+        position: absolute;
+        top: 46%;
+        left: 16%;
+        transform: translate(-50%, -50%);
+    }
+
+    .overlay111 {
+        position: absolute;
+        top: 46%;
+        left: 84%;
+        transform: translate(-50%, -50%);
+    }
+
+    .overlay22 {
+        position: absolute;
+        top: 9%;
+        left: 44%;
+        transform: translate(-50%, -50%);
+    }
+
+    .overlay33 {
+        position: absolute;
+        top: 84%;
+        left: 33%;
+        transform: translate(-50%, -50%);
+    }
+
+    .overlay44 {
+        position: absolute;
+        top: 9%;
+        left: 64%;
+        transform: translate(-50%, -50%);
+    }
+
+    .overlay55 {
+        position: absolute;
+        top: 84%;
+        left: 54%;
+        transform: translate(-50%, -50%);
+    }
+
+    .red-dot {
+        position: absolute;
+        pointer-events: none;
+        width: 90px;
+        height: 90px;
+        left: 54%;
+        top: 75%;
+        transform: translate(-50%, -50%);
+    }
+
+    #coordinates-input {
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    #move-button {
+        margin-top: 10px;
+        display: block;
+        margin: 0 auto;
+    }
+
+    #position-list {
+        margin-top: 10px;
+        text-align: left;
+    }
+
+    #position-list div {
+        width: 150px;
+        margin-bottom: 5px;
+    }
+
+    @media (max-width: 425px) {
+        .base-image, .image-container img, .overlay111, .overlay22, .overlay33, .overlay44, .overlay55, .container, .overlay, .container, .red-dot{
+            width: 50%;
+            height: auto;
+        }
+    }
+</style>
+</head>
+<body bgcolor="#FFFFF0">
+<div class="container">
+    <img class="base-image" src="demo7.png" alt="底圖">
+    <img src="girl.png" id="red-dot" class="red-dot">
+
+    <div id="coordinates-input">
+        <label for="x-coordinate">X座標：</label>
+        <input type="text" id="x-coordinate" placeholder="輸入X座標">
+        <br>
+        <label for="y-coordinate">Y座標：</label>
+        <input type="text" id="y-coordinate" placeholder="輸入Y座標">
+        <br>
+        <button id="move-button">移動小人</button>
+    </div>
+
+    <div class="overlay">
+        <a href="https://www.emporio-armani.com.tw/">
+            <img src="armani.png" alt="armani">
+        </a>
+        <div class="image-container">
+            <a href="https://www.nike.com/tw/">
+                <img src="nike.png" alt="nike">
+            </a>
+        </div>
+        <div class="image-container">
+            <a href="https://www.levis.com.tw/">
+                <img src="levis.png" alt="levis">
+            </a>
+        </div>
+        <div class="image-container">
+            <a href="https://taiwan.coach.com/">
+                <img src="coach.png" alt="coach">
+            </a>
+        </div>
+        
+        <!-- Move the red line drawing code here -->
+        <canvas id="drawingCanvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+    </div>
+
+    <div class="overlay22">
+        <a href="https://consumer.huawei.com/tw/phones/">
+            <img src="huawei.png" alt="huawei">
+        </a>
+    </div>
+    <div class="overlay44">
+        <a href="https://www.gucci.com/hk/zh_hk/">
+            <img src="gucci.png" alt="gucci">
+        </a>
+    </div>   
+
+    <div class="overlay111">
+        <a href="https://www.mi.com/tw/">
+            <img src="mi.png" alt="mi">
+        </a>
+        <div class="image-container">
+            <a href="https://www.starbucks.com.tw/home/index.jspx?r=69">
+                <img src="starbucks.png" alt="starbucks">
+            </a>
+        </div>
+        <div class="image-container">
+            <a href="https://promotion.twsamsungcampaign.com/">
+                <img src="samsung.png" alt="samsung">
+            </a>
+        </div>
+        <div class="image-container" >
+            <a href="https://tw.louisvuitton.com/zht-tw/homepage">
+                <img src="lv.png" alt="lv">
+            </a>
+        </div>
+    </div>
+    <div class="overlay33">
+        <a href="https://www.apple.com/tw/">
+            <img src="apple.png" alt="apple">
+        </a>
+    </div>
+    <div class="overlay55">
+        <a href="https://www.adidas.com.tw/">
+            <img src="adidas.png" alt="adidas">
+        </a>
+    </div>
+</div>
+
+<div id="position-list" style="display: flex; flex-direction: column; align-items: flex-start;">
+    <h3>移動紀錄</h3>
+    <div id="positions" style="display: flex; flex-direction: column;"></div>
+    <p id="position-count">移動次數: 0</p>
+</div>
+
+<script>
+window.onload = function() {
+    var xInput = document.getElementById('x-coordinate');
+    var yInput = document.getElementById('y-coordinate');
+    var redDot = document.getElementById('red-dot');
+    var moveButton = document.getElementById('move-button');
+    var positionList = document.getElementById('positions');
+    var positionCount = document.getElementById('position-count');
+    var positions = [];
+    var count = 0;
+
+    // Get the container dimensions
+    var containerWidth = document.querySelector('.container').offsetWidth;
+    var containerHeight = document.querySelector('.container').offsetHeight;
+
+    // Create a canvas for drawing the red line
+    var drawingCanvas = document.createElement('canvas');
+    drawingCanvas.width = containerWidth;
+    drawingCanvas.height = containerHeight;
+    drawingCanvas.style.position = 'absolute';
+    drawingCanvas.style.top = '0';
+    drawingCanvas.style.left = '0';
+    drawingCanvas.style.pointerEvents = 'none';
+    var ctx = drawingCanvas.getContext("2d");
+    document.querySelector('.overlay').appendChild(drawingCanvas); // Append the canvas to the overlay container
+
+    // Coordinates of the four exit points
+    var exits = [
+        { x: 20, y: 5 },
+        { x: 93, y: 18 },
+        { x: 10, y: 75 },
+        { x: 80, y: 90 }
+    ];
+
+    // Handle click event on move button
+    moveButton.addEventListener('click', function() {
+        var x = parseFloat(xInput.value);
+        var y = parseFloat(yInput.value);
+
+        if (!isNaN(x) && !isNaN(y) && x >= 0 && x <= 100 && y >= 0 && y <= 93) {
+            var minDistance = Infinity;
+            var nearestExit = null;
+
+            // Loop through all exit points, calculate distances, and find the nearest exit
+            for (var i = 0; i < exits.length; i++) {
+                var distance = Math.sqrt(Math.pow(exits[i].x - x, 2) + Math.pow(exits[i].y - y, 2));
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestExit = exits[i];
+                }
+            }
+
+            // Draw a line on the canvas
+            ctx.clearRect(0, 0, containerWidth, containerHeight); // Clear previous drawings
+            ctx.beginPath();
+            ctx.moveTo((x-5) / 100 * containerWidth, (y-24) / 100 * containerHeight);
+            ctx.lineTo((nearestExit.x-5) / 100 * containerWidth, (nearestExit.y-24) / 100 * containerHeight);
+            ctx.strokeStyle = 'red';
+            ctx.stroke();
+
+            // Move the red dot
+            redDot.style.left = x + '%';
+            redDot.style.top = y + '%';
+
+            // Update movement count and position list
+            count++;
+            positions.push({x: x, y: y});
+            updatePositionList();
+            updateCount();
+        } else {
+            alert('請輸入有效的座標值(0-100)。');
+        }
+    });
+
+    // Update the position list with current positions
+    function updatePositionList() {
+        positionList.innerHTML = '';
+        positions.forEach(function(position) {
+            var listItem = document.createElement('div');
+            listItem.textContent = '(' + position.x + ' , ' + position.y + ')';
+            positionList.appendChild(listItem);
+        });
+    }
+
+    // Update the movement count
+    function updateCount() {
+        positionCount.textContent = '移動次數: ' + count;
+    }
+};
+</script>
+
+</body>
+</html>

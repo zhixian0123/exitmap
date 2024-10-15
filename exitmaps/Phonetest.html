@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>逃生地圖與磁力計數據蒐集</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 逃生地圖 -->
+    <div class="building-group">
+        <div class="building-inner-group">
+            <div class="corridor-group"></div>
+            <canvas id="routeCanvas" style="position: absolute; top: 0; left: 0; z-index: 2; width: 100%; height: 100%;"></canvas>
+            
+            <!-- 房間組群 -->
+            <a href="https://taiwan.coach.com/" target="_blank" class="horoom-group room1"></a>
+            <a href="https://www.levis.com.tw/" target="_blank" class="horoom-group room2"></a>
+            <a href="https://www.nike.com/tw/" target="_blank" class="horoom-group room3"></a>
+            <a href="https://www.emporio-armani.com.tw/" target="_blank" class="horoom-group room4"></a>
+            <a href="https://www.asus.com/tw/" target="_blank" class="room-group room5"></a>
+            <a href="https://www.gucci.com/hk/zh_hk/" target="_blank" class="room-group room6"></a>
+            <a href="https://www.acer.com/tw-zh" target="_blank" class="horoom-group room7"></a>
+            <a href="https://www.starbucks.com.tw/home/index.jspx?r=69" target="_blank" class="horoom-group room8"></a>
+            <a href="https://promotion.twsamsungcampaign.com/" target="_blank" class="horoom-group room9"></a>
+            <a href="https://tw.louisvuitton.com/zht-tw/homepage" target="_blank" class="horoom-group room10"></a>
+            <a href="https://www.adidas.com.tw/" target="_blank" class="room-group room11"></a>
+            <a href="https://www.apple.com/tw/" target="_blank" class="room-group room12"></a>
+
+            <!-- 出口組群 -->
+            <div class="exit-group exit1"></div>
+            <div class="exit-group exit2"></div>
+            <div class="exit-group exit3"></div>
+            <div class="exit-group exit4"></div>
+
+            <!-- 使用者圖標 -->
+            <img id="userIcon" src="user-unscreen.gif" alt="User Icon" style="display: none;">
+
+            <!-- 當前位置提示標語 -->
+            <div id="positionMessage" class="position-message">此為當前位置</div>
+
+            <!-- 火災GIF圖 -->
+            <img src="fire.gif" alt="Fire Animation" class="fire-gif">
+        </div>
+    </div>
+
+    <!-- 使用者座標輸入 -->
+    <div class="input-container">
+        <input type="number" id="x-coordinate" placeholder="X 座標 (0-600)" value="517">
+        <input type="number" id="y-coordinate" placeholder="Y 座標 (0-800)" value="400">
+        <!--button onclick="calculateRoute()">計算路徑</button-->
+    </div>
+
+    <!-- 警示標語 -->
+    <div class="alert-message">已發生火災，請依照指示路線逃離</div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+
+</body>
+</html>

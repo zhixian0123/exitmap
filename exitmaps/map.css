@@ -1,0 +1,186 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #FFFFF0;
+    padding: 0;
+    margin: 0;
+}
+
+.building-group {
+    position: relative;
+    width: 60%;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #f0f0f0;
+    border: 5px solid #000;
+    box-sizing: border-box;
+    overflow: visible; /* 確保縮放時內容不超出邊界 */
+}
+
+.building-inner-group {
+    position: relative;
+    width: 100%;
+    padding-top: 133.33%; /* 使建築保持 4:3 的比例 */
+}
+
+.corridor-group {
+    position: absolute;
+    top: 19.375%;
+    left: 25%;
+    width: 50%;
+    height: 62.5%;
+    background-color: #e0e0e0;
+    background-image: url('garden.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.fire-gif {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%; /* 可以調整大小 */
+    height: auto;
+    z-index: 4; /* 確保火災GIF圖層在最前面 */
+    pointer-events: none; /* 防止干擾點擊地圖上的其他元素 */
+}
+
+.room-group, .horoom-group {
+    display: block;
+    position: absolute;
+    background-color: #b0c4de;
+    border: 6px solid #000;
+    text-align: center;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.room-group {
+    width: 25%;
+    height: 12.5%;
+}
+
+.horoom-group {
+    width: 16.6667%;
+    height: 18.75%;
+}
+
+/* 房間位置 */
+.room1 { top: 68.75%; left: calc(0% - 16.6667%); }
+.room2 { top: 50%; left: calc(0% - 16.6667%); }
+.room3 { top: 31.25%; left: calc(0% - 16.6667%); }
+.room4 { top: 12.5%; left: calc(0% - 16.6667%); }
+.room5 { top: calc(0% - 12.5%); left: 21.6667%; }
+.room6 { top: calc(0% - 12.5%); left: 50.8333%; }
+.room7 { top: 12.5%; left: calc(100%); }
+.room8 { top: 31.25%; left: calc(100%); }
+.room9 { top: 50%; left: calc(100%); }
+.room10 { top: 68.75%; left: calc(100%); }
+.room11 { top: 100%; left: 50.8333%; }
+.room12 { top: 100%; left: 21.6667%; }
+
+.exit-group {
+    position: absolute;
+    width: 10%;
+    height: 6.25%;
+    text-align: center;
+    line-height: normal;
+    font-weight: bold;
+    z-index: 1;
+    background-image: url('exit.jpg');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.exit1 { top: 0; left: 0; }
+.exit2 { top: 0; left: calc(100% - 9.95%); }
+.exit3 { top: calc(100% - 6.25%); left: 0; }
+.exit4 { top: calc(100% - 6.25%); left: calc(100% - 9.95%); }
+
+.room1 { background-image: url('coach.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room2 { background-image: url('levis.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room3 { background-image: url('nike.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room4 { background-image: url('armani.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room5 { background-image: url('asus.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room6 { background-image: url('gucci.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room7 { background-image: url('acer.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room8 { background-image: url('starbucks.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room9 { background-image: url('samsung.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room10 { background-image: url('lv.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room11 { background-image: url('adidas.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+.room12 { background-image: url('apple.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+
+#userIcon {
+    position: absolute;
+    width: 11.6667%;
+    height: auto;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.input-container {
+    text-align: center;
+    margin-top: 100px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.input-container input {
+    width: 45%;
+    padding: 8px;
+    margin: 5px;
+    font-size: 16px;
+}
+
+.input-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* 警示標語樣式 */
+.alert-message {
+    text-align: center;
+    color: red;
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 140px;
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Media Query for smaller devices */
+@media (max-width: 800px) {
+    .building-group {
+        max-width: 70%;
+        border-width: 3px;
+        transform: scale(1.1); /* 整體縮小 */
+        transform-origin: top; /* 確保縮放中心在頂部上側 */
+    }
+
+    .room-group, .horoom-group {
+        font-size: 12px;
+        border-width: 3px;
+    }
+
+    .input-container input {
+        width: 40%;
+    }
+
+    .input-container button {
+        width: 80%;
+        font-size: 14px;
+    }
+
+    .alert-message {
+        font-size: 26px;
+    }
+}

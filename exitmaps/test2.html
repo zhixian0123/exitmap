@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>逃生地圖與磁力計數據蒐集</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* 通用樣式 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFFFF0;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            margin-top: 150px;
+        }
+
+        /* 地圖樣式 */
+        .building-group {
+            position: relative;
+            width: 60%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f0f0f0;
+            border: 5px solid #000;
+            box-sizing: border-box;
+            overflow: visible;
+        }
+
+        .building-inner-group {
+            position: relative;
+            width: 100%;
+            padding-top: 133.33%;
+        }
+
+        .corridor-group {
+            position: absolute;
+            top: 19.375%;
+            left: 25%;
+            width: 50%;
+            height: 62.5%;
+            background-color: #e0e0e0;
+            background-image: url('garden.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .fire-gif {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%;
+            height: auto;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .room-group, .horoom-group {
+            display: block;
+            position: absolute;
+            background-color: #b0c4de;
+            border: 6px solid #000;
+            text-align: center;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .room-group {
+            width: 25%;
+            height: 12.5%;
+        }
+
+        .horoom-group {
+            width: 16.6667%;
+            height: 18.75%;
+        }
+        
+        /* 房間位置 */
+        .room1 { top: 68.75%; left: calc(0% - 16.6667%); }
+        .room2 { top: 50%; left: calc(0% - 16.6667%); }
+        .room3 { top: 31.25%; left: calc(0% - 16.6667%); }
+        .room4 { top: 12.5%; left: calc(0% - 16.6667%); }
+        .room5 { top: calc(0% - 12.5%); left: 21.6667%; }
+        .room6 { top: calc(0% - 12.5%); left: 50.8333%; }
+        .room7 { top: 12.5%; left: calc(100%); }
+        .room8 { top: 31.25%; left: calc(100%); }
+        .room9 { top: 50%; left: calc(100%); }
+        .room10 { top: 68.75%; left: calc(100%); }
+        .room11 { top: 100%; left: 50.8333%; }
+        .room12 { top: 100%; left: 21.6667%; }
+
+        .exit-group {
+            position: absolute;
+            width: 10%;
+            height: 6.25%;
+            text-align: center;
+            line-height: normal;
+            font-weight: bold;
+            z-index: 5;
+            background-image: url('exit.jpg');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .exit1 { top: 0; left: 0; }
+        .exit2 { top: 0; left: calc(100% - 9.95%); }
+        .exit3 { top: calc(100% - 6.25%); left: 0; }
+        .exit4 { top: calc(100% - 6.25%); left: calc(100% - 9.95%); }
+
+        .room1 { background-image: url('coach.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room2 { background-image: url('levis.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room3 { background-image: url('nike.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room4 { background-image: url('armani.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room5 { background-image: url('asus.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room6 { background-image: url('gucci.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room7 { background-image: url('acer.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room8 { background-image: url('starbucks.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room9 { background-image: url('samsung.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room10 { background-image: url('lv.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room11 { background-image: url('adidas.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+        .room12 { background-image: url('apple.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center; }
+
+        #userIcon {
+            position: absolute;
+            width: 11.6667%;
+            height: auto;
+            z-index: 6;
+            pointer-events: none;
+        }
+        
+        .input-container {
+            display: none;
+        }
+        .input-container {
+            text-align: center;
+            margin-top: 140px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .input-container input {
+            width: 45%;
+            padding: 8px;
+            margin: 5px;
+            font-size: 16px;
+        }
+
+        .input-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* 警示標語樣式 */
+        .alert-message {
+            text-align: center;
+            color: red;
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 130px;
+            animation: blinker 1s linear infinite;
+        }
+
+        /* 當前位置提示標語 */
+        .position-message {
+            color: blue;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+            position:absolute;
+        }
+        
+        @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* Media Query for smaller devices */
+        @media (max-width: 800px) {
+            .building-group {
+                max-width: 70%;
+                border-width: 3px;
+                transform: scale(1.1);
+                transform-origin: top;
+            }
+
+            .room-group, .horoom-group {
+                font-size: 12px;
+                border-width: 3px;
+            }
+
+            .input-container input {
+                width: 40%;
+            }
+
+            .input-container button {
+                width: 80%;
+                font-size: 14px;
+            }
+
+            .alert-message {
+                font-size: 26px;
+            }
+
+            .position-message {
+                font-size: 12px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 逃生地圖 -->
+    <div class="building-group">
+        <div class="building-inner-group">
+            <div class="corridor-group"></div>
+            <canvas id="routeCanvas" style="position: absolute; top: 0; left: 0; z-index: 2; width: 100%; height: 100%;"></canvas>
+            
+            <!-- 房間組群 -->
+            <a href="https://taiwan.coach.com/" target="_blank" class="horoom-group room1"></a>
+            <a href="https://www.levis.com.tw/" target="_blank" class="horoom-group room2"></a>
+            <a href="https://www.nike.com/tw/" target="_blank" class="horoom-group room3"></a>
+            <a href="https://www.emporio-armani.com.tw/" target="_blank" class="horoom-group room4"></a>
+            <a href="https://www.asus.com/tw/" target="_blank" class="room-group room5"></a>
+            <a href="https://www.gucci.com/hk/zh_hk/" target="_blank" class="room-group room6"></a>
+            <a href="https://www.acer.com/tw-zh" target="_blank" class="horoom-group room7"></a>
+            <a href="https://www.starbucks.com.tw/home/index.jspx?r=69" target="_blank" class="horoom-group room8"></a>
+            <a href="https://promotion.twsamsungcampaign.com/" target="_blank" class="horoom-group room9"></a>
+            <a href="https://tw.louisvuitton.com/zht-tw/homepage" target="_blank" class="horoom-group room10"></a>
+            <a href="https://www.adidas.com.tw/" target="_blank" class="room-group room11"></a>
+            <a href="https://www.apple.com/tw/" target="_blank" class="room-group room12"></a>
+
+            <!-- 出口組群 -->
+            <div class="exit-group exit1"></div>
+            <div class="exit-group exit2"></div>
+            <div class="exit-group exit3"></div>
+            <div class="exit-group exit4"></div>
+
+
+            <!-- 使用者圖標 -->
+            <img id="userIcon" src="user-unscreen.gif" alt="User Icon" style="display: none;">
+
+            <!-- 當前位置提示標語 -->
+            <div id="positionMessage" class="position-message">此為當前位置</div>
+
+            <!-- 火災GIF圖 -->
+            <img src="fire.gif" alt="Fire Animation" class="fire-gif">
+        </div>
+    </div>
+
+    <!-- 使用者座標輸入 -->
+    <div class="input-container">
+        <input type="number" id="x-coordinate" placeholder="X 座標 (0-600)" value="517">
+        <input type="number" id="y-coordinate" placeholder="Y 座標 (0-800)" value="400">
+        <!--button onclick="calculateRoute()">計算路徑</button>-->
+    </div>
+
+    <!-- 警示標語 -->
+    <div class="alert-message">已發生火災，請依照指示路線逃離</div>
+
+    <!-- JavaScript -->
+    <script>
+        // 保存當前路徑
+        var currentPathPoints = [];
+
+        function resizeCanvas() {
+            var canvas = document.getElementById('routeCanvas');
+            var buildingGroup = document.querySelector('.building-group'); // 找到父元素的大小
+            canvas.width = buildingGroup.offsetWidth;
+            canvas.height = buildingGroup.offsetHeight;
+
+            // 每次調整大小後重新繪製邊界點和路徑
+            drawBoundaryPoints();
+            if (currentPathPoints.length > 0) {
+                drawRoute(currentPathPoints);
+            }
+        }
+
+        window.addEventListener('load', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas);
+
+        // 走廊範圍（使用百分比）
+        var corridor = {
+            x1: 78 / 600, // 左邊界
+            y1: 95 / 800, // 上邊界
+            x2: 518 / 600, // 右邊界
+            y2: 725 / 800  // 下邊界
+        };
+
+        // 定義30個邊界上的點
+        var boundaryPoints = [];
+        var numPoints = 30;
+        var totalLength = 2 * ((corridor.x2 - corridor.x1) + (corridor.y2 - corridor.y1));
+
+        for (var i = 0; i < numPoints; i++) {
+            var distance = i * (totalLength / numPoints);
+            var point = getPointAtDistance(distance);
+            boundaryPoints.push(point);
+        }
+
+        function getPointAtDistance(distance) {
+            var x1 = corridor.x1;
+            var y1 = corridor.y1;
+            var x2 = corridor.x2;
+            var y2 = corridor.y2;
+
+            var edgeLengths = [
+                x2 - x1,     // 上邊
+                y2 - y1,     // 右邊
+                x2 - x1,     // 下邊
+                y2 - y1      // 左邊
+            ];
+
+            distance = distance % totalLength;
+
+            if (distance <= edgeLengths[0]) {
+                // 上邊
+                return { x: x1 + distance, y: y1 };
+            }
+            distance -= edgeLengths[0];
+
+            if (distance <= edgeLengths[1]) {
+                // 右邊
+                return { x: x2, y: y1 + distance };
+            }
+            distance -= edgeLengths[1];
+
+            if (distance <= edgeLengths[2]) {
+                // 下邊
+                return { x: x2 - distance, y: y2 };
+            }
+            distance -= edgeLengths[2];
+
+            if (distance <= edgeLengths[3]) {
+                // 左邊
+                return { x: x1, y: y2 - distance };
+            }
+
+            // 防止超出範圍
+            return { x: x1, y: y1 };
+        }
+
+        // 繪製30個邊界點
+        function drawBoundaryPoints() {
+            var canvas = document.getElementById('routeCanvas');
+            var ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#F0F0F0';
+            var width = canvas.width;
+            var height = canvas.height;
+            boundaryPoints.forEach(function(point) {
+                ctx.beginPath();
+                ctx.arc(point.x * width, point.y * height, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // 繪製路徑
+        function drawRoute(pathPoints) {
+            var canvas = document.getElementById('routeCanvas');
+            var ctx = canvas.getContext('2d');
+            var width = canvas.width;
+            var height = canvas.height;
+
+            ctx.beginPath();
+            ctx.moveTo(pathPoints[0].x * width, pathPoints[0].y * height);
+            for (var i = 1; i < pathPoints.length; i++) {
+                ctx.lineTo(pathPoints[i].x * width, pathPoints[i].y * height);
+            }
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 5;
+            ctx.stroke();
+        }
+
+        // 添加一個與背景相同的「橡皮擦」長方形，並放置在路徑上方
+        var eraserElement = document.createElement('div');
+        eraserElement.style.position = 'absolute';
+        eraserElement.style.backgroundColor = '#F0F0F0';  // 使用背景色
+        eraserElement.style.width = '28px';  // 視情況調整大小
+        eraserElement.style.height = '150px';
+        eraserElement.style.zIndex = '5';  // 設置為比路徑高，比使用者圖標低
+        eraserElement.style.pointerEvents = 'none';  // 禁止交互
+        document.body.appendChild(eraserElement);
+
+        // 加載使用者圖標
+        var userIcon = new Image();
+        userIcon.src = 'user-unscreen.gif'; // 請將 'user-unscreen.gif' 替換為您的 GIF 圖片路徑
+
+        // 在頁面加載時繪製點
+        window.onload = function() {
+            resizeCanvas();
+            drawBoundaryPoints();
+            calculateRoute();  // 預設座標並直接開始行動
+        };
+
+        // 預設座標並自動計算路徑
+        function calculateRoute() {
+            // 取得使用者輸入的座標
+            var xInput = parseFloat(document.getElementById('x-coordinate').value);
+            var yInput = parseFloat(document.getElementById('y-coordinate').value);
+
+            var canvas = document.getElementById('routeCanvas');
+            var width = canvas.width;
+            var height = canvas.height;
+
+            var x = xInput / 600; // 將座標轉換為百分比
+            var y = yInput / 800;
+
+            if (isNaN(xInput) || isNaN(yInput) || xInput < 0 || xInput > 600 || yInput < 0 || yInput > 800) {
+                alert('請輸入有效的座標（X: 0-600, Y: 0-800）');
+                return;
+            }
+
+            // 出口位置（使用百分比）
+            var exits = [
+                { x: 25 / 600, y: 25 / 800 },     // 出口1
+                { x: 565 / 600, y: 25 / 800 },    // 出口2
+                { x: 25 / 600, y: 765 / 800 },    // 出口3
+                { x: 565 / 600, y: 765 / 800 }    // 出口4
+            ];
+
+            // 定義走廊出口點（走廊邊緣，靠近房間）
+            var corridorExits = [
+                { x: corridor.x1, y: corridor.y1 }, // 左上角
+                { x: corridor.x2, y: corridor.y1 }, // 右上角
+                { x: corridor.x1, y: corridor.y2 }, // 左下角
+                { x: corridor.x2, y: corridor.y2 }  // 右下角
+            ];
+
+            // 找到最近的出口和對應的走廊出口點
+            var minDistance = Infinity;
+            var nearestExit = null;
+            var corridorExitPoint = null;
+
+            for (var i = 0; i < exits.length; i++) {
+                // 計算走廊出口點到出口的距離
+                var ce = corridorExits[i];
+                var e = exits[i];
+                var distance = Math.hypot(ce.x - e.x, ce.y - e.y);
+                // 計算使用者到走廊出口點的距離
+                var userToCorridorExit = Math.hypot(x - ce.x, y - ce.y);
+                // 總距離
+                var totalDistance = distance + userToCorridorExit;
+
+                if (totalDistance < minDistance) {
+                    minDistance = totalDistance;
+                    nearestExit = e;
+                    corridorExitPoint = ce;
+                }
+            }
+
+            // 路線點集合
+            var pathPoints = [{ x: x, y: y }];
+
+            // 定義靠近房間的走廊邊緣位置（左或右）
+            var corridorEdgeX = x < (corridor.x1 + corridor.x2) / 2 ? corridor.x1 : corridor.x2;
+
+            // 如果使用者不在走廊內，先移動到走廊入口
+            var userInCorridor = x >= corridor.x1 && x <= corridor.x2 && y >= corridor.y1 && y <= corridor.y2;
+
+            if (!userInCorridor) {
+                // 計算使用者位置與走廊邊緣的最近點
+                var nearestX = corridorEdgeX;
+                var nearestY = Math.max(corridor.y1, Math.min(y, corridor.y2));
+                pathPoints.push({ x: nearestX, y: nearestY });
+            } else {
+                // 使用者在走廊內，先移動到走廊邊緣
+                if (x !== corridorEdgeX) {
+                    pathPoints.push({ x: corridorEdgeX, y: y });
+                }
+            }
+
+            // 沿著走廊邊緣移動到走廊出口點
+            if (pathPoints[pathPoints.length - 1].y !== corridorExitPoint.y) {
+                pathPoints.push({ x: corridorEdgeX, y: corridorExitPoint.y });
+            }
+
+            // 從走廊出口點移動到出口
+            pathPoints.push(nearestExit);
+
+            // 儲存當前路徑點以便重新繪製
+            currentPathPoints = pathPoints;
+
+            // 繪製路線
+            var ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, width, height); // 清除之前的繪圖
+
+            // 重新繪製30個邊界點
+            drawBoundaryPoints();
+
+            // 繪製路線
+            drawRoute(pathPoints);
+
+            // 顯示提示訊息
+            var positionMessage = document.getElementById("positionMessage");
+            positionMessage.style.display = "block";
+
+            // 開始讓使用者沿著路徑移動
+            moveAlongPath(pathPoints);
+        }
+
+        // 讓使用者圖標沿著路徑平滑移動，並用背景色長方形覆蓋路徑
+        function moveAlongPath(pathPoints) {
+            var index = 1;
+            
+
+            var userIconElement = document.getElementById('userIcon');
+            var positionMessage = document.getElementById("positionMessage");
+
+            var canvas = document.getElementById('routeCanvas');
+            var width = canvas.width;
+            var height = canvas.height;
+            
+            // 設置 transition 屬性來控制平滑過渡效果
+            userIconElement.style.transition = 'left 8s linear, top 8s linear'; // 控制圖標的移動速度
+            eraserElement.style.transition = 'left 7.9s linear, top 7.9s linear'; // 控制橡皮擦的移動速度
+
+            // 定位到第一個點（沒有等待）
+            if (pathPoints.length > 0) {
+                var xStart = pathPoints[0].x;
+                var yStart = pathPoints[0].y;
+                userIconElement.style.left = (xStart * width) - 15 + 'px'; // 使用 pixel 精確定位
+                userIconElement.style.top = (yStart * height) - 15 + 'px'; // 使用 pixel 精確定位
+                eraserElement.style.left = (xStart * width) + 57 + 'px'; // 讓橡皮擦在圖標下方
+                eraserElement.style.top = (yStart * height) + 177 + 'px'; // 讓橡皮擦在圖標下方
+                userIconElement.style.display = 'block';
+
+                // 顯示提示訊息，並將其置於使用者圖標旁邊
+                positionMessage.style.left = (xStart * width) + 'px';
+                positionMessage.style.top = (yStart * height) - 40 + 'px';
+            }
+
+            // 每次移動時，讓橡皮擦覆蓋路徑
+            function move() {
+                if (index < pathPoints.length) {
+                    // 獲取當前點的百分比位置
+                    var x = pathPoints[index].x;
+                    var y = pathPoints[index].y;
+
+                    // 移動使用者圖標和橡皮擦
+                    userIconElement.style.left = (x * width) - 15 + 'px';  // 使用 pixel 精確定位
+                    userIconElement.style.top = (y * height) - 15 + 'px';  // 使用 pixel 精確定位
+
+                    eraserElement.style.left = (x * width) + 57 + 'px';  // 讓橡皮擦跟隨使用者
+                    eraserElement.style.top = (y * height) + 177 + 'px';  // 準確覆蓋路徑
+
+                    // 移動提示訊息至使用者圖標旁邊
+                    positionMessage.style.left = (x * width) + 'px';
+                    positionMessage.style.top = (y * height) - 40 + 'px';
+
+                    // 移動到下一個點
+                    index++;
+
+                    // 每隔 1000 毫秒（1秒）移動一次
+                    setTimeout(move2, 4000);
+                }
+            }
+
+            function move2() {
+                if (index < pathPoints.length) {
+                    // 獲取當前點的百分比位置
+                    var x = pathPoints[index].x;
+                    var y = pathPoints[index].y;
+
+                    // 移動使用者圖標，精確定位
+                    userIconElement.style.left = (x * width) -15 + 'px';  // 使用 pixel 精確定位
+                    userIconElement.style.top = (y * height) -15 + 'px';  // 使用 pixel 精確定位
+                    
+                    eraserElement.style.left = (x * width) + 57 + 'px';  // 讓橡皮擦跟隨使用者
+                    eraserElement.style.top = (y * height) + 165 + 'px';  // 準確覆蓋路徑
+
+                    // 移動提示訊息至使用者圖標旁邊
+                    positionMessage.style.left = (x * width) + 'px';
+                    positionMessage.style.top = (y * height) -40 + 'px';
+
+                    // 移動到下一個點
+                    index++;
+
+                    // 移動後隱藏提示訊息
+                    positionMessage.style.display = "none";
+                    
+                    // 每隔 4000 毫秒（4秒）移動一次
+                    setTimeout(move3, 8000);
+                }
+            }
+
+            function move3() {
+                if (index < pathPoints.length) {
+                    userIconElement.style.transition = 'left 1s linear, top 1s linear';
+                    eraserElement.style.transition = 'left 1s linear, top 1s linear'; // 控制橡皮擦的移動速度 
+                    
+                    // 獲取當前點的百分比位置
+                    var x = pathPoints[index].x;
+                    var y = pathPoints[index].y;
+
+                    // 移動使用者圖標，精確定位
+                    userIconElement.style.left = (x * width) -15 + 'px';  // 使用 pixel 精確定位
+                    userIconElement.style.top = (y * height) -15 + 'px';  // 使用 pixel 精確定位
+
+                    eraserElement.style.left = (x * width) + 57 + 'px';  // 讓橡皮擦跟隨使用者
+                    eraserElement.style.top = (y * height) + 163.5 + 'px';  // 準確覆蓋路徑
+
+                    // 移動提示訊息至使用者圖標旁邊
+                    positionMessage.style.left = (x * width) + 'px';
+                    positionMessage.style.top = (y * height) -40 + 'px';
+
+                    // 移動到下一個點
+                    index++;
+
+                    // 每隔 4000 毫秒（4秒）移動一次
+                    setTimeout(move, 4000);
+                }
+            }
+
+            // 立即開始移動
+            move();
+        }
+
+    </script>
+
+</body>
+</html> 
